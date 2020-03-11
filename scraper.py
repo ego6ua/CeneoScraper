@@ -10,7 +10,7 @@ page_respons = requests.get(url)
 page_tree = BeautifulSoup(page_respons.text, 'html.parser')
 
 #wydobycie z kodu HTML strony fragmentow odpowiadajacych poszczegolnym opiniom
-opinions = page_tree.find_all("li", "review-box")
+opinions = page_tree.find_all("li", "js_product-review")
 
 
 #wydobycie skladowych dla pojedynczej opinii
