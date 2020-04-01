@@ -4,9 +4,31 @@ from bs4 import BeautifulSoup
 import pprint
 import json
 
+#funkcja do ekstrkcji składowych opinii
+def extract_feature(opinion, tag, tag_class, child=None):
+    try:
+        if child:
+            return opinion.find(tag, tag_class).find(child).get_tex().strip()
+        else:
+            return opinion.find(tag, tag_class).get_tex().strip()
+    except AttributeError:
+        return None
+
+tags = {
+    "recommendation":["div", "product-review-summary", "em"],
+    "stars":["span", "review-score-count"],
+    "content":["p", "product-review-body"],
+    "author":["div", "reviewer-name-line"],
+    "pros":["div", "pros-cell", "ul"],
+    "cons":["div", "cons-cell", "ul"],
+    "useful":["button", "vote-yes", "span"],
+    "useless":["button", "vote-no", "span"],
+    "purchased":["div", "product-review-pz","em"],
+}    
+
 #adres URL przykladowej strony z opiniami
 url_prefix = "https://www.ceneo.pl"
-product_id = input("Podaj kod produktu:")
+product_id = input("Podaj kod produktu: ")
 url_postfix = "#tab=reviews"
 url = url_prefix+"/"+product_id+url_postfix
 
@@ -19,57 +41,24 @@ while url:
     page_tree = BeautifulSoup(page_respons.text, 'html.parser')
 
     #wydobycie z kodu HTML strony fragmentow odpowiadajacych poszczegolnym opiniom
-    opinions = page_tree.find_all("li", "review-box")
+    opinions = page_tree.find_all("li", "js_product-review")
 
     
-
     #wydobycie skladowych dla pojedynczej opinii
     for opinion in opinions:
-        opinion_id = opinion['data-entry-id']
-        author = opinion.find("div", "reviewer-name-line").string
-        try:
-            recommendation = opinion.find("div", "product-review-summary").find("em").string
-        except AttributeError:
-            recommendation = None
-        stars = opinion.find("span", "review-score-count").string
-        try:
-            purchased = opinion.find("div", "product-review-pz").find("em").string
-        except AttributeError:
-            purchased = None
+        features = {key:extract_feature(opinion, *args)
+                    for key, args in tags.items()}
+
+        features["purchased"] = (features["purchased"] == "Opinia potwerdzona zakupem")
+        features["opinion_id"] = opinion['data-entry-id']
         dates = opinion.find("span", "review-time").find_all("time")
-        review_date = dates.pop(0)["datetime"]
-        try:
-            purchase_date = dates.pop(0)["datetime"]
+        features["review_date"] = dates.pop(0)["datetime"]
+        try:            
+            features["purchase_date"] = dates.pop(0)["datetime"]
         except IndexError:
-            purchase_date = None
-        useful = opinion.find("button", "vote-yes").find("span").string
-        useless = opinion.find("button", "vote-no").find("span").string
-        content = opinion.find("p", "product-review-body").get_text()
-        try:
-            pros = opinion.find("div", "pros-cell").find("ul").get_text()
-        except IndexError:
-            pros = None
-        try:
-            cons = opinion.find("div", "cons-cell").find("ul").get_text()
-        except IndexError:
-            cons = None
+            features["purchase_date"] = None
 
-        opinion_dict = {
-            "opinion_dict":opinion_id,
-            "recommendation":recommendation,
-            "stars":stars,
-            "content":content,
-            "author":author,
-            "pros":pros,
-            "cons":cons,
-            "useful":useful,
-            "useless":useless,
-            "purchased":purchased,
-            "purchase_date":purchase_date,
-            "review_date":review_date,
-        }
-
-        opinions_list.append(opinion_dict)
+        opinions_list.append(tags)
 
     try:
         url = url_prefix+page_tree.find("a", "pagination__next")["href"]
@@ -78,8 +67,7 @@ while url:
     print(url)
 
 
-with open(product_id+'.json', 'w', encoding="utf-8") as fp:
+with open("./opinions_json/".product_id+'.json', 'w', encoding="utf-8") as fp:
     json.dump(opinions_list, fp, ensure_ascii=False, indent=4, separators=(',', ': '))
 
-
-# pprint.pprint(opinions_list) 
+#pprint.pprint(opinions_list)
