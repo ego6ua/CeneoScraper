@@ -8,9 +8,9 @@ import json
 def extract_feature(opinion, tag, tag_class, child=None):
     try:
         if child:
-            return opinion.find(tag, tag_class).find(child).get_tex().strip()
+            return opinion.find(tag, tag_class).find(child).get_text().strip()
         else:
-            return opinion.find(tag, tag_class).get_tex().strip()
+            return opinion.find(tag, tag_class).get_text().strip()
     except AttributeError:
         return None
 
@@ -23,7 +23,7 @@ tags = {
     "cons":["div", "cons-cell", "ul"],
     "useful":["button", "vote-yes", "span"],
     "useless":["button", "vote-no", "span"],
-    "purchased":["div", "product-review-pz","em"],
+    "purchased":["div", "product-review-pz","em"]
 }    
 
 #adres URL przykladowej strony z opiniami
@@ -58,7 +58,7 @@ while url:
         except IndexError:
             features["purchase_date"] = None
 
-        opinions_list.append(tags)
+        opinions_list.append(features)
 
     try:
         url = url_prefix+page_tree.find("a", "pagination__next")["href"]
