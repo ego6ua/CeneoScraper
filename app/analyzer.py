@@ -24,7 +24,6 @@ plt.xticks(rotation=0)
 ax.set_title("Częstość występowania poszczególnych ocen")
 ax.set_xlabel("liczba gwiazdek")
 ax.set_ylabel("liczba opinii")
-
 plt.savefig("figures_png/"+product_id+"_bar.png")
 plt.close()
 
