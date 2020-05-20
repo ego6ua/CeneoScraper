@@ -29,7 +29,7 @@
 - zapis danych do obiektu dataframe (ramka danych)
 - wykonanie podstawowych obloczen na danych w ramce danych
 - wykonanie prostych wykresow na podstawie danych w ramce danych
-## Etap 6
+## Etap 6 - przygotowanie interfajsu webowego aplikcaji (Flask)
 - struktura aplikacji
     /CeneoScraper  
         /run.py  
