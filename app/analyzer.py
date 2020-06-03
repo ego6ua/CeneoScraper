@@ -14,8 +14,6 @@ product_id = input("Podaj kod produktu: ")
 opinions = pd.read_json("app/opinions_json/"+product_id+'.json')
 opinions = opinions.set_index("opinion_id")
 
-opinions["stars"] = opinions["stars"].map(lambda x: float(x.split("/")[0].replace(",",".")))
-
 #czestość występowania poszczególnej liczby gwiazdek
 stars = opinions["stars"].value_counts().sort_index().reindex(list(np.arange(0, 5.1, 0.5)), fill_value=0)
 fig , ax = plt.subplots()
@@ -32,7 +30,7 @@ recommendation = opinions["recommendation"].value_counts()
 fig, ax = plt.subplots()
 recommendation.plot.pie(label="", autopct="%.1f%%", colors=['mediumseagreen', 'indianred'])
 ax.set_title("Udział poszczególnych rekomendacji w ogólnej liczbie opinii")
-plt.savefig("app/static/figures_png/"+product_id+"_pie.png")
+plt.savefig("./figures_png/"+product_id+"_pie.png")
 plt.close()
 
 #podstawowe startstyki

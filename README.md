@@ -35,7 +35,7 @@
         /run.py  
         /config.py  
         /app  
-            /\_\_init\_\_.py
+            /__init__.py
             /views.py  
             /models.py 
             /scraper.py
